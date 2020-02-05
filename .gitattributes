@@ -1,5 +1,6 @@
-# External code and data
+# External
 pseudo/* linguist-vendored
+LICENSE linguist-vendored
 
 # Docs
-LICENSE -linguist-vendored
+README.md linguist-documentation
