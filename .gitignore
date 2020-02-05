@@ -1,0 +1,10 @@
+# OS generated files
+.DS_Store
+
+# Output files
+*.pdf
+*.pyc
+
+# Directories 
+**/out
+**/temp
