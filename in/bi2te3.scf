@@ -1,0 +1,51 @@
+#!/bin/sh
+
+cat > $prefix.scf.in <<EOF
+ &control
+  calculation = 'scf'
+  title = 'Self-consistent field calculation of $prefix'
+  verbosity = 'high'
+  restart_mode = 'from_scratch'
+  outdir ='$TMP_DIR/'
+  prefix ='$prefix'
+  pseudo_dir = '$PSEUDO_DIR/'
+  tprnfor = .TRUE.
+ /
+ &system
+  ibrav = 5
+  celldm(1) =  20.2138 ! in Angstrom:  10.6967
+  celldm(4) = 0.913485
+  nat = 5
+  ntyp = 2
+  nbnd = $num_band
+  ecutwfc = $ecutwfc
+  ecutrho = $ecutrho
+  occupations = 'fixed' 
+  lspinorb = .TRUE.
+  noncolin = .TRUE.
+  starting_magnetization = 0.0
+ /
+ &electrons
+  electron_maxstep = 100
+  conv_thr = 1.0d-8
+  mixing_mode = 'plain'
+  mixing_beta = 0.3d0
+  diagonalization = 'cg'
+  diago_full_acc = .TRUE.
+ /
+ATOMIC_SPECIES
+ Bi     208.98038   $pseudo_bi
+ Te     127.60000   $pseudo_te
+ATOMIC_POSITIONS {angstrom}
+ Te 0.0 0.0 0.0
+ Te 0.0 0.0 6.5991260
+ Bi 0.0 0.0 12.437204
+ Bi 0.0 0.0 18.713669
+ Te 0.0 0.0 24.551748
+K_POINTS {automatic}
+ $num_kx $num_ky $num_kz 0 0 0
+EOF
+
+$PW_COMMAND < $prefix.scf.in > $prefix.scf.out
+check_failure $?
+$ECHO " done"

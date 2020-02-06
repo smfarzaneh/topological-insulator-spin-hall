@@ -36,7 +36,7 @@ WANNIER_BIN_LIST="wannier90.x postw90.x"
 PSEUDO_LIST="$pseudo_bi, $pseudo_te"
 TMP_ROOT_DIR="$THIS_DIR/temp"
 TMP_DIR="$THIS_DIR/temp/$prefix"
-IN_DIR="$THIS_DIR/include"
+IN_DIR="$THIS_DIR/in"
 OUT_DIR="$THIS_DIR/out/$prefix"
 
 $ECHO
@@ -107,6 +107,11 @@ $ECHO "  running pw2wannier90.x $PW2WANNIER90_COMMAND"
 $ECHO "  running wannier90.x    $WANNIER90_COMMAND"
 $ECHO "  running postw90.x      $POSTW90_COMMAND"
 $ECHO
+
+$ECHO "  running the scf calculation...\c"
+. $IN_DIR/$prefix.scf
+# $ECHO "  generating required overlaps...\c"
+# $WANNIER90_COMMAND -pp $prefix
 
 cd $THIS_DIR
 # end of file
