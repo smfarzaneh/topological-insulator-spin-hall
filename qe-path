@@ -1,3 +1,0 @@
-#!/bin/sh
-
-QE_PATH=$HOME/qe-6.4.1 # replace with your quantum espresso path
