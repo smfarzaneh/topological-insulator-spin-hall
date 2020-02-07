@@ -31,7 +31,7 @@ cat > $prefix.nscf.in <<EOF
   conv_thr = 1.0d-8
   mixing_mode = 'plain'
   mixing_beta = 0.3d0
-  diagonalization = 'cg'
+  diagonalization = 'david'
   diago_full_acc = .TRUE.
  /
 ATOMIC_SPECIES
