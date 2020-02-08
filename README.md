@@ -30,3 +30,4 @@ begin projections
 random
 end projections
 ```
+There is also a related [thread](http://www.democritos.it/pipermail/wannier/2007-May/000067.html) on Wannier mail list. 
