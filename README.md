@@ -13,7 +13,7 @@ Here is a list of some common problems that might occur during calculations:
 
 1. **value of berry_task not recognised in param_read**  
 The error is still present in the latest release of *Wannier90* `v3.0.0`. 
-To resolve this issue you need to use try the develop branch of the wannier90 repository. 
+To resolve this issue you might need to try the [develop branch](https://github.com/wannier-developers/wannier90/archive/develop.zip) of the wannier90 repository. 
 There is a related [issue](https://github.com/wannier-developers/wannier90/issues/286) on github as well. 
 
 2. **kmesh_get_bvector: Not enough bvectors found**  
