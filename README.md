@@ -21,4 +21,12 @@ This error can be resolved by changing (inreasing) the `kmesh_tol` in the `.win`
 
 3. **Direct lattice mismatch**  
 This error happens because the real and reciprocal lattice vectors of the `.scf` file and the `.win` file do not match.  
-I was not able to get a perfect match, so I just commented out the part of code that compares lattice vectors in `pw2wannier90.f90` file and recompiled it. 
+I was not able to get a perfect match, so I just commented out the part of code that compares lattice vectors in `pw2wannier90.f90` file and recompiled it.
+
+4. **too many projections to be used without selecting a subset**  
+The error seems to go away if you set the projections in the `.win` file to random as follows. 
+```
+begin projections
+random
+end projections
+```
