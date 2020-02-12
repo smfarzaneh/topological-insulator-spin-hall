@@ -1,0 +1,18 @@
+#!/bin/sh
+
+cat > $prefix.pw2wan.in <<EOF
+ &inputpp 
+  outdir = '$TMP_DIR'
+  prefix = '$prefix'
+  seedname = '$prefix'
+  write_mmn = .true.
+  write_amn = .true.
+  write_spn = .true.
+  spn_formatted = .true.
+  write_unk = .false.
+ /
+EOF
+
+$PW2WANNIER90_COMMAND < $prefix.pw2wan.in > $prefix.pw2wan.out
+check_failure $?
+$ECHO " done"
