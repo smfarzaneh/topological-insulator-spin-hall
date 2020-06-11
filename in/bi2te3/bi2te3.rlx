@@ -1,0 +1,58 @@
+#!/bin/sh
+ 
+cat > $prefix.rlx.in <<EOF
+ &control
+  calculation = 'relax'
+  title = 'Relaxation of $prefix structure'
+  verbosity = 'high'
+  restart_mode = 'from_scratch'
+  outdir ='$TMP_DIR/'
+  prefix ='$prefix'
+  pseudo_dir = '$PSEUDO_DIR/'
+  tprnfor = .TRUE.
+  forc_conv_thr=1.0d-7
+  etot_conv_thr=1.0d-8
+ /
+ &system
+  ibrav = 5
+  celldm(1) = 20.09637782
+  celldm(4) = 0.91209790
+  nat = 5
+  ntyp = 2
+  nbnd = $num_band
+  ecutwfc = $ecutwfc
+  ecutrho = $ecutrho
+  occupations = 'fixed' 
+  lspinorb = .TRUE.
+  noncolin = .TRUE.
+  starting_magnetization = 0.0
+ /
+ &electrons
+  electron_maxstep = 100
+  conv_thr = 1.0d-8
+  mixing_mode = 'plain'
+  mixing_beta = 0.3d0
+  diagonalization = 'david'
+  diago_full_acc = .TRUE.
+ /
+ &ions
+  ion_dynamics = 'bfgs'
+  upscale = 20.0
+ /
+ATOMIC_SPECIES
+ Bi 208.98040  $pseudo_bi
+ Te 127.60000  $pseudo_te
+ATOMIC_POSITIONS {angstrom}
+ Te 0.00000000 0.00000000  0.00000000
+ Te 0.00000000 0.00000000  6.53277801
+ Bi 0.00000000 0.00000000 12.37343933
+ Bi 0.00000000 0.00000000 18.58128560
+ Te 0.00000000 0.00000000 24.42194692
+K_POINTS {automatic}
+ $num_kx $num_ky $num_kz 0 0 0
+EOF
+
+$PW_COMMAND < $prefix.rlx.in > $prefix.rlx.out
+check_failure $?
+$ECHO " done"
+

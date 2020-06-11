@@ -8,7 +8,7 @@ cat > $prefix.pw2wan.in <<EOF
   write_mmn = .true.
   write_amn = .true.
   write_spn = .true.
-  spn_formatted = .true.
+  spn_formatted = .false.
   write_unk = .false.
  /
 EOF

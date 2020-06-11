@@ -13,8 +13,8 @@ cat > $prefix.scf.in <<EOF
  /
  &system
   ibrav = 5
-  celldm(1) =  20.2138 ! in Angstrom:  10.6967
-  celldm(4) = 0.913485
+  celldm(1) = 20.09637782
+  celldm(4) = 0.91209790
   nat = 5
   ntyp = 2
   nbnd = $num_band
@@ -30,18 +30,18 @@ cat > $prefix.scf.in <<EOF
   conv_thr = 1.0d-8
   mixing_mode = 'plain'
   mixing_beta = 0.3d0
-  diagonalization = 'cg'
+  diagonalization = 'david'
   diago_full_acc = .TRUE.
  /
 ATOMIC_SPECIES
- Bi     208.98038   $pseudo_bi
- Te     127.60000   $pseudo_te
+ Bi 208.98040  $pseudo_bi
+ Te 127.60000  $pseudo_te
 ATOMIC_POSITIONS {angstrom}
- Te 0.0 0.0 0.0
- Te 0.0 0.0 6.5991260
- Bi 0.0 0.0 12.437204
- Bi 0.0 0.0 18.713669
- Te 0.0 0.0 24.551748
+ Te 0.00000000 0.00000000  0.000000000
+ Te 0.00000000 0.00000000  6.528968484
+ Bi 0.00000000 0.00000000 12.368658463
+ Bi 0.00000000 0.00000000 18.586066467
+ Te 0.00000000 0.00000000 24.425756446
 K_POINTS {automatic}
  $num_kx $num_ky $num_kz 0 0 0
 EOF

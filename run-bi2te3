@@ -3,14 +3,13 @@
 # problem specific parameters
 prefix='bi2te3'
 pseudo_bi='Bi.rel-pbe-dn-kjpaw_psl.1.0.0.UPF'
-pseudo_te='Te.rel-pbe-n-kjpaw_psl.1.0.0.UPF'
-ecutwfc=45.0
-ecutrho=456.0
-num_kx=4
-num_ky=4
-num_kz=4
-overlap='.TRUE.'
-num_band=60
+pseudo_te='Te.rel-pbe-dn-kjpaw_psl.0.2.2.UPF'
+ecutwfc=56.0
+ecutrho=457.0
+num_kx=8
+num_ky=8
+num_kz=8
+num_band=90
 
 THIS_DIR=`pwd`
 
@@ -18,7 +17,7 @@ THIS_DIR=`pwd`
 if test "`echo -e`" = "-e" ; then ECHO=echo ; else ECHO="echo -e" ; fi
 
 $ECHO
-$ECHO "Starting ab initio calculations for Bi2Te3..."
+$ECHO "Starting ab initio calculations for $prefix..."
 $ECHO 
 
 # set quantum espresso and wannier90 paths
@@ -36,7 +35,7 @@ WANNIER_BIN_LIST="wannier90.x postw90.x"
 PSEUDO_LIST="$pseudo_bi, $pseudo_te"
 TMP_ROOT_DIR="$THIS_DIR/temp"
 TMP_DIR="$THIS_DIR/temp/$prefix"
-IN_DIR="$THIS_DIR/in"
+IN_DIR="$THIS_DIR/in/$prefix"
 OUT_DIR="$THIS_DIR/out/$prefix"
 
 $ECHO
@@ -93,6 +92,8 @@ for FILE in $PSEUDO_LIST ; do
 done
 $ECHO " done"
 
+PARA_PREFIX="mpirun -np 12"
+
 # how to run executables
 PW_COMMAND="$PARA_PREFIX $BIN_DIR/pw.x $PARA_POSTFIX"
 BANDS_COMMAND="$PARA_PREFIX $BIN_DIR/bands.x $PARA_POSTFIX"
@@ -108,10 +109,44 @@ $ECHO "  running wannier90.x    $WANNIER90_COMMAND"
 $ECHO "  running postw90.x      $POSTW90_COMMAND"
 $ECHO
 
-$ECHO "  running the scf calculation...\c"
-. $IN_DIR/$prefix.scf
-# $ECHO "  generating required overlaps...\c"
-# $WANNIER90_COMMAND -pp $prefix
+# $ECHO "  running the structural relaxation...\c"
+# . $IN_DIR/$prefix.rlx
+# check_failure $?
+# $ECHO " done"
 
-cd $THIS_DIR
+# $ECHO "  running the scf calculation...\c"
+# . $IN_DIR/$prefix.scf
+# check_failure $?
+# $ECHO " done"
+
+# $ECHO "  running the nscf calculation...\c"
+# . $IN_DIR/$prefix.nscf
+# check_failure $?
+# $ECHO " done"
+
+# cp $IN_DIR/$prefix.win $prefix.win
+# $ECHO "  generating the list of required overlaps...\c"
+# $WANNIER_PATH/wannier90.x -pp $prefix
+# check_failure $?
+# $ECHO " done"
+
+# $ECHO "  computing overlaps...\c"
+# . $IN_DIR/$prefix.pw2wan
+# check_failure $?
+# $ECHO " done"
+
+# cp $IN_DIR/$prefix.win $prefix.win
+# $ECHO "  computing maximally localized Wannier functions...\c"
+# $WANNIER_PATH/wannier90.x $prefix
+# check_failure $?
+# $ECHO " done"
+
+cp $IN_DIR/$prefix.win $prefix.win
+$ECHO "  computing spin Hall conductivity...\c"
+mpirun -np 12 $WANNIER_PATH/postw90.x $prefix 
+check_failure $?
+$ECHO " done"
+
+
+# cd $THIS_DIR
 # end of file
