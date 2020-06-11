@@ -1,0 +1,152 @@
+#!/bin/sh
+
+# problem specific parameters
+prefix='bi2se3'
+pseudo_bi='Bi.rel-pbe-dn-kjpaw_psl.1.0.0.UPF'
+pseudo_se='Se.rel-pbe-dn-kjpaw_psl.1.0.0.UPF'
+ecutwfc=56.0
+ecutrho=457.0
+num_kx=8
+num_ky=8
+num_kz=8
+num_band=90
+
+THIS_DIR=`pwd`
+
+# check whether echo has the -e option
+if test "`echo -e`" = "-e" ; then ECHO=echo ; else ECHO="echo -e" ; fi
+
+$ECHO
+$ECHO "Starting ab initio calculations for $prefix..."
+$ECHO 
+
+# set quantum espresso and wannier90 paths
+. set-path
+# set environment variables path
+ENV_PATH=$QE_PATH/environment_variables
+# set the needed environment variables
+. $ENV_PATH
+# override pseudopotential path
+PSEUDO_DIR=$THIS_DIR/pseudo
+
+# required executables, pseudopotentials, and directories
+QE_BIN_LIST="pw.x bands.x pw2wannier90.x"
+WANNIER_BIN_LIST="wannier90.x postw90.x"
+PSEUDO_LIST="$pseudo_bi, $pseudo_te"
+TMP_ROOT_DIR="$THIS_DIR/temp"
+TMP_DIR="$THIS_DIR/temp/$prefix"
+IN_DIR="$THIS_DIR/in/$prefix"
+OUT_DIR="$THIS_DIR/out/$prefix"
+
+$ECHO
+$ECHO "  Quantum ESSPRESSO executables directory: $BIN_DIR"
+$ECHO "  Wannier90 executables directory:         $WANNIER_PATH"
+$ECHO "  Pseudopotentials directory:              $PSEUDO_DIR"
+$ECHO "  Temporary directory:                     $TMP_DIR"
+$ECHO "\n  checking that needed directories and files exist...\c"
+
+# check for directories
+for DIR in "$BIN_DIR" "$WANNIER_PATH" "$PSEUDO_DIR" ; do
+    if test ! -d $DIR ; then
+        $ECHO
+        $ECHO "ERROR: $DIR not existent or not a directory"
+        $ECHO "Aborting"
+        exit 1
+    fi
+done
+for DIR in "$TMP_ROOT_DIR" "$TMP_DIR" "$OUT_DIR" ; do
+    if test ! -d $DIR ; then
+        mkdir $DIR
+    fi
+done
+cd $OUT_DIR
+
+# check for qe executables
+for FILE in $QE_BIN_LIST ; do
+    if test ! -x $BIN_DIR/$FILE ; then
+        $ECHO
+        $ECHO "ERROR: $BIN_DIR/$FILE not existent or not executable"
+        $ECHO "Aborting"
+        exit 1
+    fi
+done
+
+# check for wannier executables
+ for FILE in $WANNIER_BIN_LIST ; do
+     if test ! -x $WANNIER_PATH/$FILE ; then
+         $ECHO
+         $ECHO "ERROR: $WANNIER_PATH/$FILE not existent or not executable"
+         $ECHO "Aborting"
+         exit 1
+     fi
+ done
+
+# check for pseudopotentials
+for FILE in $PSEUDO_LIST ; do
+    if test $? != 0; then
+        $ECHO
+        $ECHO "ERROR: $PSEUDO_DIR/$FILE not existent or not readable"
+        $ECHO "Aborting"
+        exit 1
+    fi
+done
+$ECHO " done"
+
+PARA_PREFIX="mpirun -np 12"
+
+# how to run executables
+PW_COMMAND="$PARA_PREFIX $BIN_DIR/pw.x $PARA_POSTFIX"
+BANDS_COMMAND="$PARA_PREFIX $BIN_DIR/bands.x $PARA_POSTFIX"
+PW2WANNIER90_COMMAND="$PARA_PREFIX $BIN_DIR/pw2wannier90.x $PARA_POSTFIX"
+WANNIER90_COMMAND="$PARA_PREFIX $WANNIER_PATH/wannier90.x $PARA_POSTFIX"
+POSTW90_COMMAND="$PARA_PREFIX $WANNIER_PATH/postw90.x $PARA_POSTFIX"
+
+$ECHO
+$ECHO "  running pw.x as:       $PW_COMMAND"
+$ECHO "  running bands.x as:    $BANDS_COMMAND"
+$ECHO "  running pw2wannier90.x $PW2WANNIER90_COMMAND"
+$ECHO "  running wannier90.x    $WANNIER90_COMMAND"
+$ECHO "  running postw90.x      $POSTW90_COMMAND"
+$ECHO
+
+# $ECHO "  running the structural relaxation...\c"
+# . $IN_DIR/$prefix.rlx
+# check_failure $?
+# $ECHO " done"
+
+# $ECHO "  running the scf calculation...\c"
+# . $IN_DIR/$prefix.scf
+# check_failure $?
+# $ECHO " done"
+
+# $ECHO "  running the nscf calculation...\c"
+# . $IN_DIR/$prefix.nscf
+# check_failure $?
+# $ECHO " done"
+
+# cp $IN_DIR/$prefix.win $prefix.win
+# $ECHO "  generating the list of required overlaps...\c"
+# $WANNIER_PATH/wannier90.x -pp $prefix
+# check_failure $?
+# $ECHO " done"
+
+# $ECHO "  computing overlaps...\c"
+# . $IN_DIR/$prefix.pw2wan
+# check_failure $?
+# $ECHO " done"
+
+# cp $IN_DIR/$prefix.win $prefix.win
+# $ECHO "  computing maximally localized Wannier functions...\c"
+# $WANNIER_PATH/wannier90.x $prefix
+# check_failure $?
+# $ECHO " done"
+
+cp $IN_DIR/$prefix.win $prefix.win
+$ECHO "  computing spin Hall conductivity...\c"
+mpirun -np 12 $WANNIER_PATH/postw90.x $prefix 
+check_failure $?
+$ECHO " done"
+
+
+# cd $THIS_DIR
+# end of file
