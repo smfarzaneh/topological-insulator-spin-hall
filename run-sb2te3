@@ -9,7 +9,7 @@ ecutrho=242.0
 num_kx=4
 num_ky=4
 num_kz=4
-num_band=90
+num_band=70
 
 THIS_DIR=`pwd`
 
